@@ -1,11 +1,12 @@
+import config
 import smtplib
 
 class Emailer(object):
     def __init__(self, user, password):
         self.user = user
         self.password = password
-        self.email = "%s@gmail.com" % user
-        self.server = smtplib.SMTP("smtp.gmail.com", 587)
+        self.email = user.join(config.EMAILER_SUFFIX)
+        self.server = smtplib.SMTP(config.EMAILER_SERVER, config.EMAILER_PORT)
 
     def __enter__(self):
         self.server.ehlo()
