@@ -25,7 +25,7 @@ class listener(StreamListener):
         LOGGER.info(status.text)
         url = status._json['entities']['urls'][0]['expanded_url']
         html_content = urllib2.urlopen(url).read()
-        regex = '(?:\A|(?<=.))[^.]*%s[^.]*(?:.|\Z)' % config.QUERY
+        regex = '[^\n]*%s[^\n]*(?:.)' % config.QUERY
         matches = re.findall(regex, html_content, 0)
         msg = []
         if len(matches) > 0:
