@@ -8,6 +8,7 @@ import config
 import logging
 import re
 import urllib2
+import requests
 
 LOGGER = logging.getLogger("DUMPMON")
 logging.basicConfig(
@@ -24,9 +25,10 @@ class listener(StreamListener):
     def on_status(self, status):
         LOGGER.info(status.text)
         url = status._json['entities']['urls'][0]['expanded_url']
-        html_content = urllib2.urlopen(url).read()
+	r = requests.get(url)
+	if r.status_code == 200:
         regex = '[^\n]*%s[^\n]*(?:.)' % config.QUERY
-        matches = re.findall(regex, html_content, 0)
+        matches = re.findall(regex, r.text, 0)
         msg = []
         if len(matches) > 0:
             HEADER = "YOU HAVE BEEN PWND (potentially)"
@@ -40,6 +42,8 @@ class listener(StreamListener):
                 LOGGER.info(match)
             with Emailer(config.EMAILER_USER, config.EMAILER_PASS) as emailer:
                 emailer.send_email(msg='\n'.join(msg))
+	else:
+		LOGGER.info("Failed to get content from %s", url)
 
 
 if __name__ == "__main__":
